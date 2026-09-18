@@ -1,0 +1,48 @@
+huddlecast
+Copyright (c) 2026 Leafd
+
+This product is licensed under the MIT License; see LICENSE.
+
+It redistributes the following third-party components, which remain under
+their own licenses.
+
+-------------------------------------------------------------------------------
+internal/web/static/chime/chime-sdk.bundle.js
+
+  Amazon Chime SDK for JavaScript, version 3.32.0
+  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  Licensed under the Apache License, Version 2.0 - see licenses/Apache-2.0.txt
+  https://github.com/aws/amazon-chime-sdk-js
+
+  This file is an esbuild bundle. Minification stripped the per-module license
+  headers, so the following dependencies compiled into it are listed here:
+
+    tslib
+    Copyright (c) Microsoft Corporation.
+    Licensed under the Apache License, Version 2.0
+
+    Closure Library
+    Copyright 2009 The Closure Library Authors
+    Licensed under the Apache License, Version 2.0
+
+    long.js
+    Copyright 2020 Daniel Wirtz / The long.js Authors.
+    Licensed under the Apache License, Version 2.0
+
+    AWS SDK for JavaScript components (@aws-sdk)
+    Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+    Licensed under the Apache License, Version 2.0
+
+-------------------------------------------------------------------------------
+internal/web/static/primer.css
+
+  Primer CSS
+  Copyright (c) 2019 GitHub Inc.
+  Licensed under the MIT License - see licenses/Primer-MIT.txt
+  https://primer.style
+
+-------------------------------------------------------------------------------
+internal/web/static/chime/standby.jpg
+
+  Original photograph, used with the subject's permission. Covered by this
+  project's MIT License.
