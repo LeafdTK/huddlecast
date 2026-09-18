@@ -1,0 +1,28 @@
+FROM golang:1.26-bookworm AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/huddlecast ./cmd/huddlecast
+
+FROM bluenviron/mediamtx:1.21.0-ffmpeg AS mediamtx
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      chromium xvfb ffmpeg fonts-liberation fonts-noto-color-emoji \
+      ca-certificates tini curl util-linux \
+    && rm -rf /var/lib/apt/lists/*
+RUN useradd -m -u 10001 huddlecast
+COPY --from=mediamtx /mediamtx /usr/local/bin/mediamtx
+COPY --from=build /out/huddlecast /usr/local/bin/huddlecast
+COPY deploy/huddlecast.orchard.yml /config/huddlecast.yml
+COPY deploy/mediamtx.orchard.yml /config/mediamtx.yml
+COPY deploy/orchard-entrypoint.sh /usr/local/bin/orchard-entrypoint
+RUN chmod +x /usr/local/bin/orchard-entrypoint
+RUN mkdir -p /data /recordings && chown huddlecast:huddlecast /data /recordings
+WORKDIR /home/huddlecast
+ENV HUDDLECAST_CONFIG=/config/huddlecast.yml \
+    MEDIAMTX_CONFIG=/config/mediamtx.yml \
+    HUDDLECAST_NO_SANDBOX=1
+EXPOSE 8080 8889 1935 8189/udp
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/orchard-entrypoint"]

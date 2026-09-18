@@ -47,7 +47,7 @@ func TestAuthHandler(t *testing.T) {
 }
 
 func TestURLs(t *testing.T) {
-	c := New("http://mtx:9997/", "http://mtx:8889", "example.org")
+	c := New("http://mtx:9997/", "http://mtx:8889", "example.org", "", "")
 	if c.WHEPURL(PushPath("k")) != "http://mtx:8889/live/k/whep" {
 		t.Error(c.WHEPURL(PushPath("k")))
 	}

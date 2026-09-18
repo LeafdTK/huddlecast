@@ -1,0 +1,31 @@
+listen: ":8080"
+public_url: "${HUDDLECAST_PUBLIC_URL}"
+data_dir: "/data"
+
+slack:
+  team_id: "${SLACK_TEAM_ID}"
+  host: "${SLACK_HOST}"
+
+accounts:
+  - name: streambot-1
+    cookie_d: "${HUDDLE_COOKIE_1}"
+
+mediamtx:
+  api_url: "http://127.0.0.1:9997"
+  internal_url: "http://127.0.0.1:8889"
+  public_host: "${MEDIAMTX_PUBLIC_HOST}"
+  public_whip_base: "${MEDIAMTX_PUBLIC_WHIP_BASE}"
+  public_rtmp_base: "${MEDIAMTX_PUBLIC_RTMP_BASE}"
+  recordings_dir: "/recordings"
+
+huddle:
+  target_engine: chime
+  mirror_engine: chime
+
+browser:
+  headless: "true"
+
+web:
+  auth: password
+  password: "${WEB_PASSWORD}"
+  session_secret: "${WEB_SESSION_SECRET}"

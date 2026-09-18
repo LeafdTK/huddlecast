@@ -93,6 +93,10 @@ type MediaMTX struct {
 
 	PublicHost string `yaml:"public_host"`
 
+	PublicWHIPBase string `yaml:"public_whip_base"`
+
+	PublicRTMPBase string `yaml:"public_rtmp_base"`
+
 	RecordingsDir string `yaml:"recordings_dir"`
 }
 
@@ -168,6 +172,8 @@ func (c *Config) applyDefaults() {
 	def(&c.MediaMTX.APIURL, "http://127.0.0.1:9997")
 	def(&c.MediaMTX.InternalURL, "http://127.0.0.1:8889")
 	def(&c.MediaMTX.PublicHost, "localhost")
+	def(&c.MediaMTX.PublicWHIPBase, "http://"+c.MediaMTX.PublicHost+":8889")
+	def(&c.MediaMTX.PublicRTMPBase, "rtmp://"+c.MediaMTX.PublicHost+":1935")
 	def(&c.MediaMTX.RecordingsDir, "./recordings")
 	def(&c.Browser.Headless, "auto")
 	if c.Browser.Width == 0 {

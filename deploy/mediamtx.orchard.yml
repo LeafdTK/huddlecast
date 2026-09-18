@@ -1,0 +1,52 @@
+logLevel: info
+logDestinations: [stdout]
+
+authMethod: http
+authHTTPAddress: http://127.0.0.1:8080/hooks/mediamtx/auth
+authHTTPExclude:
+  - action: api
+  - action: metrics
+  - action: pprof
+
+api: true
+apiAddress: 127.0.0.1:9997
+
+rtsp: true
+rtspAddress: 127.0.0.1:8554
+rtspTransports: [tcp]
+rtspEncryption: "no"
+srt: false
+hls: false
+playback: false
+moq: false
+
+rtmp: true
+rtmpAddress: :1935
+
+webrtc: true
+webrtcAddress: :8889
+webrtcLocalUDPAddress: :8189
+webrtcIPsFromInterfaces: true
+webrtcAdditionalHosts: []
+webrtcICEServers2: []
+
+pathDefaults:
+  record: true
+  recordPath: /recordings/%path/%Y-%m-%d_%H-%M-%S-%f
+  recordFormat: fmp4
+  recordPartDuration: 1s
+  recordSegmentDuration: 1h
+  recordDeleteAfter: 720h
+  overridePublisher: true
+
+paths:
+  ~^rtmp/(.+)$:
+    record: false
+    runOnAvailable: >-
+      ffmpeg -hide_banner -loglevel warning -rtsp_transport tcp
+      -i rtsp://127.0.0.1:8554/rtmp/$G1
+      -c:v copy -c:a libopus -b:a 128k -ar 48000 -ac 2
+      -f rtsp -rtsp_transport tcp rtsp://127.0.0.1:8554/live/$G1
+    runOnAvailableRestart: true
+  ~^live/.+$:
+  ~^mirror/.+$:

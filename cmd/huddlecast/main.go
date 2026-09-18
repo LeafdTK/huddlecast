@@ -111,7 +111,7 @@ func serve(args []string, log *slog.Logger) error {
 	}
 	defer st.Close()
 
-	m := media.New(cfg.MediaMTX.APIURL, cfg.MediaMTX.InternalURL, cfg.MediaMTX.PublicHost)
+	m := media.New(cfg.MediaMTX.APIURL, cfg.MediaMTX.InternalURL, cfg.MediaMTX.PublicHost, cfg.MediaMTX.PublicWHIPBase, cfg.MediaMTX.PublicRTMPBase)
 	if err := m.Healthy(ctx); err != nil {
 		log.Warn("mediamtx not reachable yet", "err", err)
 	}
@@ -185,7 +185,7 @@ func probe(args []string, log *slog.Logger) error {
 			return fmt.Errorf("no account %q", *account)
 		}
 	}
-	m := media.New(cfg.MediaMTX.APIURL, cfg.MediaMTX.InternalURL, cfg.MediaMTX.PublicHost)
+	m := media.New(cfg.MediaMTX.APIURL, cfg.MediaMTX.InternalURL, cfg.MediaMTX.PublicHost, cfg.MediaMTX.PublicWHIPBase, cfg.MediaMTX.PublicRTMPBase)
 	if *whep == "" {
 		*whep = m.WHEPURL(media.PushPath("probe"))
 	}

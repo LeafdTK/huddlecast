@@ -14,14 +14,24 @@ type Client struct {
 	apiURL      string
 	internalURL string
 	publicHost  string
+	whipBase    string
+	rtmpBase    string
 	http        *http.Client
 }
 
-func New(apiURL, internalURL, publicHost string) *Client {
+func New(apiURL, internalURL, publicHost, whipBase, rtmpBase string) *Client {
+	if whipBase == "" {
+		whipBase = fmt.Sprintf("http://%s:8889", publicHost)
+	}
+	if rtmpBase == "" {
+		rtmpBase = fmt.Sprintf("rtmp://%s:1935", publicHost)
+	}
 	return &Client{
 		apiURL:      strings.TrimRight(apiURL, "/"),
 		internalURL: strings.TrimRight(internalURL, "/"),
 		publicHost:  publicHost,
+		whipBase:    strings.TrimRight(whipBase, "/"),
+		rtmpBase:    strings.TrimRight(rtmpBase, "/"),
 		http:        &http.Client{Timeout: 5 * time.Second},
 	}
 }
@@ -37,15 +47,15 @@ func (c *Client) WHEPURL(path string) string { return c.internalURL + "/" + path
 func (c *Client) WHIPURL(path string) string { return c.internalURL + "/" + path + "/whip" }
 
 func (c *Client) PublicWHIPURL(streamKey string) string {
-	return fmt.Sprintf("http://%s:8889/%s/whip", c.publicHost, PushPath(streamKey))
+	return fmt.Sprintf("%s/%s/whip", c.whipBase, PushPath(streamKey))
 }
 
 func (c *Client) PublicRTMPURL() string {
-	return fmt.Sprintf("rtmp://%s:1935/rtmp", c.publicHost)
+	return c.rtmpBase + "/rtmp"
 }
 
 func (c *Client) PublicWHEPURL(path string) string {
-	return fmt.Sprintf("http://%s:8889/%s/whep", c.publicHost, path)
+	return fmt.Sprintf("%s/%s/whep", c.whipBase, path)
 }
 
 type Path struct {
