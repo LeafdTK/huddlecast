@@ -1,0 +1,83 @@
+listen: ":8080"
+public_url: "https://huddlecast.hackclub.com"
+data_dir: "/data"
+
+slack:
+  team_id: "T0266FRGM"
+  host: "hackclub.enterprise.slack.com"
+  bot_token: "${SLACK_BOT_TOKEN}"
+  app_token: "${SLACK_APP_TOKEN}"
+  client_id: "${SLACK_CLIENT_ID}"
+  client_secret: "${SLACK_CLIENT_SECRET}"
+  slash_command: "/huddlecast"
+  admins:
+    - "U0123ABCDEF"
+
+# accounts can also be added at runtime from the dashboard (Admin -> Identities),
+# where they are stored in sqlite. these config accounts are always available too.
+accounts:
+  - name: streambot-1
+    cookie_d: "${HUDDLE_COOKIE_1}"
+    user_id: "U0AAAAAAAAA"
+  - name: streambot-2
+    cookie_d: "${HUDDLE_COOKIE_2}"
+    user_id: "U0BBBBBBBBB"
+
+mediamtx:
+  api_url: "http://mediamtx:9997"
+  internal_url: "http://mediamtx:8889"
+  public_host: "huddlecast.hackclub.com"
+  recordings_dir: "/recordings"
+
+browser:
+  bin: "/usr/bin/chromium"
+  headless: "auto"
+  width: 1280
+  height: 720
+  fps: 30
+  screenshot_interval: 5s
+
+huddle:
+  join_timeout: 60s
+  leave_when_alone_after: 10m
+  rejoin_backoff_max: 2m
+  # how a target huddle is driven:
+  #   "chime": bot joins the target huddle's Chime meeting via the rooms API and
+  #            publishes the source (OBS/WHEP) straight in as its content share.
+  #            no Slack DOM, no headless-chrome canvas re-encode — fast + light.
+  #   "browser": legacy path; drives the full Slack client + in-page shim.
+  target_engine: chime
+  # how a mirror source is captured:
+  #   "chime": join the source huddle's Chime meeting, re-broadcast a whitelisted
+  #            participant's screen/camera. "browser": legacy DOM scraping.
+  mirror_engine: chime
+
+# optional: sync completed recordings to a Cloudflare R2 (S3-compatible) bucket.
+# leave the bucket empty to keep recordings on local disk only.
+recording:
+  r2:
+    endpoint: "https://<accountid>.r2.cloudflarestorage.com"
+    region: auto
+    bucket: ""
+    access_key_id: "${R2_ACCESS_KEY_ID}"
+    secret_access_key: "${R2_SECRET_ACCESS_KEY}"
+    prefix: "recordings/"
+    public_base_url: ""
+    delete_local_after_upload: false
+
+# default stream quality (overridable per-session in the web UI → New session → Advanced).
+# on the Chime target, video comes straight from your OBS output (the bot forwards it
+# 1:1), so set resolution/fps/bitrate in OBS; audio is always re-encoded here.
+quality:
+  video:
+    width: 1280
+    height: 720
+    fps: 30
+    max_bitrate_kbps: 2500
+  audio:
+    profile: music-stereo   # music-stereo | music-mono | speech
+    max_bitrate_kbps: 128
+
+web:
+  auth: slack
+  session_secret: "${WEB_SESSION_SECRET}"

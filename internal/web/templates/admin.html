@@ -1,0 +1,77 @@
+{{define "content"}}
+<h1 class="h2 mb-3">Admin</h1>
+<div class="d-flex flex-wrap" style="gap:16px">
+  <div class="Box flex-1" style="min-width:340px">
+    <div class="Box-header"><span class="text-bold f6">Whitelist</span></div>
+    {{range .Whitelist}}
+    <div class="Box-row d-flex flex-items-center flex-justify-between">
+      <div><code>{{.UserID}}</code> {{.Name}} {{if .Admin}}<span class="Label Label--accent ml-1">admin</span>{{end}}<div class="f6 color-fg-muted">added by {{.AddedBy}}</div></div>
+      <form method="post" action="/admin/whitelist/remove"><input type="hidden" name="user_id" value="{{.UserID}}"><button class="btn btn-sm btn-danger" type="submit">Remove</button></form>
+    </div>
+    {{end}}
+    <div class="Box-row">
+      <form method="post" action="/admin/whitelist" class="d-flex flex-wrap flex-items-center" style="gap:8px">
+        <input class="form-control input-sm" name="user_id" placeholder="U0123ABC" required>
+        <input class="form-control input-sm" name="name" placeholder="name (optional)">
+        <label class="f6"><input type="checkbox" name="admin"> admin</label>
+        <button class="btn btn-sm" type="submit">Add</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="Box flex-1" style="min-width:340px">
+    <div class="Box-header"><span class="text-bold f6">mediamtx</span></div>
+    <div class="Box-body">
+      {{if .MediaMTXError}}<span class="pill warn">unreachable</span> <span class="color-fg-danger f6">{{.MediaMTXError}}</span>{{else}}<span class="pill ok">healthy</span>{{end}}
+    </div>
+  </div>
+</div>
+
+<h2 class="h4 mt-4 mb-1">Identities</h2><div class="Box mb-3">
+  <div class="Box-header"><span class="text-bold f6">Managed identities</span></div>
+  {{if not .Identities}}<div class="Box-row color-fg-muted">No identities added from the dashboard yet.</div>{{end}}
+  {{range .Identities}}
+  <div class="Box-row d-flex flex-items-center flex-justify-between">
+    <div>
+      <span class="text-bold">{{.Name}}</span>
+      <span class="Label ml-1">{{.Mode}}</span>
+      <span class="pill st-{{.Status}} ml-1">{{.Status}}</span>
+      <div class="f6 color-fg-muted">cookie {{.CookieHint}}{{if .LastError}} · <span class="color-fg-danger">{{.LastError}}</span>{{end}}</div>
+    </div>
+    <form method="post" action="/admin/identities/remove"><input type="hidden" name="name" value="{{.Name}}"><button class="btn btn-sm btn-danger" type="submit">Remove</button></form>
+  </div>
+  {{end}}
+  {{range .Accounts}}
+  <div class="Box-row d-flex flex-items-center flex-justify-between color-bg-subtle">
+    <div><span class="text-bold">{{.Name}}</span> <span class="Label Label--secondary ml-1">config</span> <span class="pill st-{{.Status}} ml-1">{{.Status}}</span>{{if .LastError}}<div class="f6 color-fg-danger">{{.LastError}}</div>{{end}}</div>
+  </div>
+  {{end}}
+  <div class="Box-row">
+    <form method="post" action="/admin/identities" class="d-flex flex-wrap flex-items-center" style="gap:8px">
+      <input class="form-control input-sm" name="name" placeholder="identity name" required>
+      <input class="form-control input-sm flex-1" name="cookie_d" placeholder="xoxd-… (d cookie)" required style="min-width:220px">
+      <select class="form-select select-sm" name="mode">
+        <option value="screen">screen</option>
+        <option value="camera">camera</option>
+        <option value="both">both</option>
+      </select>
+      <button class="btn btn-sm" type="submit">Add identity</button>
+    </form>
+  </div>
+</div>
+
+<h2 class="h4 mt-4 mb-2">All stream keys</h2>
+<div class="Box">
+  <div class="Box-header"><span class="text-bold f6">Keys</span></div>
+  {{range .Keys}}
+  <div class="Box-row d-flex flex-items-center flex-justify-between">
+    <div class="d-flex flex-items-center">
+      <code class="secret" data-secret="{{.Key}}">••••••••••••</code>
+      <button class="btn btn-sm ml-2" type="button" onclick="hcReveal(this)">Show</button>
+      <span class="color-fg-muted f6 ml-2">{{.Label}} · owner {{.OwnerID}} · {{.CreatedAt}}</span>
+    </div>
+    <form method="post" action="/keys/remove"><input type="hidden" name="key" value="{{.Key}}"><button class="btn btn-sm btn-danger" type="submit">Delete</button></form>
+  </div>
+  {{end}}
+</div>
+{{end}}

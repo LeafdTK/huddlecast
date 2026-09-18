@@ -1,0 +1,108 @@
+{{define "content"}}
+{{$s := .S}}
+<div class="d-flex flex-items-start flex-justify-between mb-3">
+  <div>
+    <h1 class="h2 d-flex flex-items-center">{{$s.ID}} <span class="pill ml-2 {{if eq $s.Status "running"}}ok{{else}}warn{{end}}">{{$s.Status}}</span></h1>
+    <div class="color-fg-muted f6">{{$s.SourceType}} · <code>{{$s.SourcePath}}</code> · by {{$s.CreatedBy}} · started {{$s.CreatedAt}}</div>
+  </div>
+  {{if eq $s.Status "running"}}
+  <form method="post" action="/sessions/{{$s.ID}}/stop" onsubmit="return confirm('stop streaming to every huddle?')"><button class="btn btn-danger" type="submit">Stop session</button></form>
+  {{end}}
+</div>
+
+<div class="d-flex flex-wrap" style="gap:16px">
+  <div class="Box flex-1" style="min-width:300px">
+    <div class="Box-header d-flex flex-items-center flex-justify-between">
+      <span class="text-bold f6">Source</span>
+      <span class="pill {{if $s.SourceLive}}ok{{else}}warn{{end}}" id="source-pill">{{if $s.SourceLive}}live{{else}}offline{{end}}</span>
+    </div>
+    <div class="Box-body">
+      {{if $s.SourceLive}}<video class="shot" data-whep="{{.PreviewURL}}" muted autoplay playsinline></video>{{else}}<div class="shot d-flex flex-items-center flex-justify-center color-fg-muted f6">source offline</div>{{end}}
+      {{if .OBSWHIP}}
+      <div class="Box-row d-flex flex-items-center px-0">
+        <code class="secret" data-secret="{{$s.SourceRef}}">••••••••••••</code>
+        <button class="btn btn-sm ml-2" type="button" onclick="hcReveal(this)">Show</button>
+        <span class="color-fg-muted f6 ml-2">OBS stream key / WHIP bearer</span>
+      </div>
+      <div class="f6 color-fg-muted mt-1 secret-details hidden">WHIP <code>{{.OBSWHIP}}</code> · RTMP <code>{{.OBSRTMP}}</code></div>
+      {{else}}
+      <p class="mb-2">Mirroring the huddle in <code>{{$s.SourceRef}}</code></p>
+      {{with $s.Mirror}}
+      <span class="pill st-{{.Status}}">{{.Status}}</span> <span class="color-fg-muted f6">{{.Error}}</span>
+      {{end}}
+      {{end}}
+      {{if eq $s.Status "running"}}
+      <form method="post" action="/sessions/{{$s.ID}}/record" class="mt-2">
+        <input type="hidden" name="record" value="{{if .Record}}off{{else}}on{{end}}">
+        <button class="btn btn-sm {{if .Record}}btn-danger{{end}}" type="submit">{{if .Record}}Stop recording{{else}}Start recording{{end}}</button>
+        <span class="pill ml-2 {{if .Record}}st-error{{else}}{{end}}">{{if .Record}}recording{{else}}not recording{{end}}</span>
+      </form>
+      {{end}}
+    </div>
+  </div>
+  <div class="Box flex-1" style="min-width:300px">
+    <div class="Box-header"><span class="text-bold f6">Presentation</span></div>
+    <div class="Box-body">
+      <form method="post" action="/sessions/{{$s.ID}}/presentation" class="d-flex flex-items-center" style="gap:12px">
+        {{range .Presentations}}<label class="d-inline-flex flex-items-center"><input type="radio" name="presentation" value="{{.}}" class="mr-1" {{if eq . $s.Presentation}}checked{{end}}> {{.}}</label>{{end}}
+        <button class="btn btn-sm" type="submit">Apply</button>
+      </form>
+      {{if eq $s.Status "running"}}
+      <h3 class="h6 mt-3 mb-1">Add target</h3>
+      <form method="post" action="/sessions/{{$s.ID}}/targets" class="d-flex">
+        <input class="form-control input-sm mr-2" name="channel" placeholder="#channel or C0123" required>
+        <button class="btn btn-sm" type="submit">Add</button>
+      </form>
+      {{end}}
+    </div>
+  </div>
+</div>
+
+{{if eq $s.Status "running"}}
+<details class="Box mt-4">
+  <summary class="Box-header text-bold f6" style="cursor:pointer">Quality</summary>
+  <div class="Box-body">
+    <form method="post" action="/sessions/{{$s.ID}}/quality">
+      {{template "qualityfields" .Quality}}
+      <button class="btn btn-sm btn-primary mt-3" type="submit">Apply quality</button>
+    </form>
+  </div>
+</details>
+{{end}}
+
+<h2 class="h4 mt-4 mb-2">Targets</h2>
+<div class="cards" id="targets">
+  {{range $s.Targets}}
+  <div class="Box target" data-target="{{.ID}}">
+    <div class="Box-row d-flex flex-items-center flex-justify-between">
+      <strong>#{{.ChannelName}}</strong>
+      <span class="pill st-{{if .Snap}}{{.Snap.Status}}{{else}}{{.Status}}{{end}}" data-status>{{if .Snap}}{{.Snap.Status}}{{else}}{{.Status}}{{end}}</span>
+    </div>
+    <div class="Box-body">
+      <div class="color-fg-muted f6">account {{.Account}}{{if .Snap}}{{if ge .Snap.Participants 0}} · {{.Snap.Participants}} in huddle{{end}} · {{since .Snap.Since}}{{end}}</div>
+      <div class="color-fg-danger f6" data-error>{{if .Snap}}{{.Snap.Error}}{{else}}{{.LastError}}{{end}}</div>
+      <div class="f6 mt-1" data-stats>
+        {{if .Snap}}{{with .Snap.Stats}}
+        {{if .Standby}}<span class="pill warn">standby</span>{{else}}<span class="pill ok">live</span>{{end}}
+        <span class="color-fg-muted"> source {{if .SourceRes}}{{.SourceRes}}{{else}}—{{end}} · in {{.SourceFPS}}fps {{.SourceKbps}}kbps · out {{.PaintFPS}}fps</span>
+        {{end}}{{end}}
+      </div>
+      {{if eq $s.Status "running"}}
+      <form method="post" action="/sessions/{{$s.ID}}/targets/{{.ID}}/remove" class="mt-2"><button class="btn btn-sm btn-danger" type="submit">Remove</button></form>
+      {{end}}
+    </div>
+  </div>
+  {{end}}
+</div>
+
+<div class="d-flex flex-items-center flex-justify-between mt-4 mb-2">
+  <h2 class="h4 m-0">Unified chat</h2>
+  <a class="btn btn-sm" href="/sessions/{{$s.ID}}/chat.txt">Export .txt</a>
+</div>
+<div class="Box p-3 chat" id="chat" data-session="{{$s.ID}}">
+  {{range .Chat}}
+  <div class="msg" data-id="{{.ID}}"><span class="chan">#{{.ChannelName}}</span> <span class="user">{{.UserName}}</span> <span class="text">{{.Text}}</span></div>
+  {{end}}
+</div>
+<script>hcSession({{$s.ID}}, {{eq $s.Status "running"}});</script>
+{{end}}

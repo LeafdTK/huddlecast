@@ -1,0 +1,20 @@
+{{define "content"}}
+<div class="Box color-shadow-medium" style="width:340px">
+  <div class="Box-header">
+    <h3 class="Box-title">Sign in to huddlecast</h3>
+  </div>
+  <div class="Box-body">
+    {{if eq .Mode "slack"}}
+    <a class="btn btn-primary btn-block" href="/auth/slack">Sign in with Slack</a>
+    {{else}}
+    <form method="post" action="/login">
+      <div class="form-group">
+        <div class="form-group-header"><label for="password">Password</label></div>
+        <div class="form-group-body"><input class="form-control input-block" type="password" id="password" name="password" autofocus></div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+    {{end}}
+  </div>
+</div>
+{{end}}

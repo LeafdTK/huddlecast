@@ -1,0 +1,40 @@
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:1.21.0-ffmpeg
+    restart: unless-stopped
+    environment:
+      MTX_WEBRTCADDITIONALHOSTS: ${PUBLIC_IP:-127.0.0.1}
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+      - recordings:/recordings
+    ports:
+      - "8889:8889"
+      - "8189:8189/udp"
+      - "1935:1935"
+
+  huddlecast:
+    image: ghcr.io/leafdtk/huddlecast:latest
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mediamtx
+    env_file:
+      - ../.env
+    volumes:
+      - ../huddlecast.yml:/config/huddlecast.yml:ro
+      - data:/data
+      - recordings:/recordings:ro
+    ports:
+      - "8080:8080"
+    shm_size: "1gb"
+    deploy:
+      resources:
+        limits:
+          cpus: "6"
+          memory: 6g
+
+volumes:
+  data:
+  recordings:

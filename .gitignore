@@ -1,0 +1,10 @@
+/huddlecast
+/data/
+/recordings/
+/huddlecast.yml
+/.env
+/bin/
+/mediamtx.dev.yml
+/auto.crt
+/auto.key
+/serve.log

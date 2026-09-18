@@ -1,0 +1,33 @@
+html, body { height: 100%; }
+body { margin: 0; }
+
+.app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+.app-sidebar { display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
+.app-main { min-width: 0; max-width: 1180px; }
+.app-user { margin-top: auto; }
+.app-logo { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--bgColor-accent-muted, #ddf4ff); font-size: 18px; }
+.app-centered { display: grid; place-items: center; min-height: 100vh; padding: 24px; }
+
+.SideNav-item { font-weight: 500; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.shot { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; border-radius: 6px; border: 1px solid var(--borderColor-default, #d1d9e0); background: #0b0d11; margin: 8px 0; }
+.chat { max-height: 480px; overflow: auto; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; max-height: 240px; overflow: auto; }
+
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; }
+  .app-sidebar { position: static; height: auto; }
+}
+
+.hidden { display: none !important; }
+
+.pill { display: inline-block; padding: 0 7px; font-size: 12px; font-weight: 500; line-height: 18px; border-radius: 2em; white-space: nowrap; background: var(--bgColor-neutral-muted, #818b981f); color: var(--fgColor-muted, #59636e); }
+.pill.ok, .pill.st-streaming { background: var(--bgColor-success-muted, #dafbe1); color: var(--fgColor-success, #1a7f37); }
+.pill.warn, .pill.st-joined, .pill.st-joining, .pill.st-launching, .pill.st-pending, .pill.st-waiting { background: var(--bgColor-attention-muted, #fff8c5); color: var(--fgColor-attention, #9a6700); }
+.pill.st-error, .pill.st-needs_reauth, .pill.bad { background: var(--bgColor-danger-muted, #ffebe9); color: var(--fgColor-danger, #d1242f); }
+
+.chat .msg { padding: 4px 0; border-bottom: 1px solid var(--borderColor-muted, #d1d9e0b3); font-size: 13px; }
+.chat .msg:last-child { border-bottom: 0; }
+.msg .chan { color: var(--fgColor-accent, #0969da); font-weight: 600; }
+.msg .user { color: var(--fgColor-attention, #9a6700); font-weight: 600; }

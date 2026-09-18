@@ -1,0 +1,16 @@
+{{define "content"}}
+<h1 class="h2 mb-1">Recordings</h1>{{if .Missing}}<div class="flash flash-error mb-3">Recordings directory does not exist; check mediamtx.recordings_dir and the volume mount.</div>{{end}}
+<div class="Box">
+  <div class="Box-header"><span class="text-bold f6">Files</span></div>
+  {{if not .Recordings}}<div class="Box-row color-fg-muted">No recordings yet.</div>{{end}}
+  {{range .Recordings}}
+  <div class="Box-row d-flex flex-items-center flex-justify-between">
+    <div class="min-width-0">
+      <div class="text-bold">{{.Name}}</div>
+      <div class="f6 color-fg-muted">{{.StreamKey}} · <span class="Label {{if eq .Storage "r2"}}Label--accent{{else}}Label--secondary{{end}}">{{.Storage}}</span> · {{bytes .Size}} · {{.CreatedAt}}</div>
+    </div>
+    {{if .URL}}<a class="btn btn-sm" href="{{.URL}}" target="_blank" rel="noopener">Open</a>{{else}}<span class="color-fg-muted f6">unavailable</span>{{end}}
+  </div>
+  {{end}}
+</div>
+{{end}}

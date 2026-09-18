@@ -1,0 +1,66 @@
+{{define "content"}}
+<div class="d-flex flex-items-center flex-justify-between mb-3">
+  <h1 class="h2">Sessions</h1>
+  <a class="btn btn-primary" href="/sessions/new">New session</a>
+</div>
+
+{{if not .Running}}
+<div class="blankslate blankslate-narrow border rounded-2 mb-4">
+  <h3 class="blankslate-heading">Nothing streaming right now</h3>
+  <p>Start a session to broadcast one source into many huddles.</p>
+  <a class="btn btn-primary" href="/sessions/new">New session</a>
+</div>
+{{else}}
+<div class="cards mb-4">
+  {{range .Running}}
+  <a class="Box Box--hover d-block color-fg-default no-underline" href="/sessions/{{.ID}}">
+    <div class="Box-row d-flex flex-items-center flex-justify-between">
+      <strong>{{.ID}}</strong>
+      <span class="pill {{if .SourceLive}}ok{{else}}warn{{end}}">{{if .SourceLive}}source live{{else}}source offline{{end}}</span>
+    </div>
+    <div class="Box-row color-fg-muted f6">{{.SourceType}} · {{.SourceRef}} · {{.Presentation}} · by {{.CreatedBy}}</div>
+    <div class="Box-row">
+      {{range .Targets}}<span class="pill st-{{if .Snap}}{{.Snap.Status}}{{else}}{{.Status}}{{end}} mr-1 mb-1">#{{.ChannelName}}{{if .Snap}}{{if ge .Snap.Participants 0}} · {{.Snap.Participants}}{{end}}{{end}}</span>{{end}}
+    </div>
+  </a>
+  {{end}}
+</div>
+{{end}}
+
+<h2 class="h4 mb-1">Your stream keys</h2><div class="Box mb-3">
+  <div class="Box-header d-flex flex-items-center flex-justify-between">
+    <span class="text-bold f6">Keys</span>
+    <form method="post" action="/keys" class="d-flex">
+      <input class="form-control input-sm mr-2" name="label" placeholder="label (optional)">
+      <button class="btn btn-sm" type="submit">Create key</button>
+    </form>
+  </div>
+  {{if not .Keys}}<div class="Box-row color-fg-muted">No stream keys yet.</div>{{end}}
+  {{range .Keys}}
+  <div class="Box-row d-flex flex-items-center flex-justify-between">
+    <div class="min-width-0">
+      <div class="d-flex flex-items-center">
+        <code class="secret" data-secret="{{.Key}}">••••••••••••</code>
+        <button class="btn btn-sm ml-2" type="button" onclick="hcReveal(this)">Show</button>
+        {{if .Label}}<span class="color-fg-muted ml-2">{{.Label}}</span>{{end}}
+      </div>
+      <div class="f6 color-fg-muted mt-1 secret-details hidden">WHIP <code>{{.WHIP}}</code> · RTMP <code>{{.RTMP}}</code></div>
+    </div>
+    <form method="post" action="/keys/remove"><input type="hidden" name="key" value="{{.Key}}"><button class="btn btn-sm btn-danger" type="submit">Delete</button></form>
+  </div>
+  {{end}}
+</div>
+
+{{if .Recent}}
+<h2 class="h4 mb-2">Recent</h2>
+<div class="Box">
+  <div class="Box-header"><span class="text-bold f6">Ended sessions</span></div>
+  {{range .Recent}}
+  <div class="Box-row d-flex flex-items-center flex-justify-between">
+    <div><a href="/sessions/{{.ID}}">{{.ID}}</a> <span class="color-fg-muted f6">{{.SourceType}} {{.SourceRef}}</span></div>
+    <div class="color-fg-muted f6">{{range .Targets}}#{{.ChannelName}} {{end}}· {{.CreatedAt}} → {{.EndedAt}}</div>
+  </div>
+  {{end}}
+</div>
+{{end}}
+{{end}}

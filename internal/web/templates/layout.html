@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-color-mode="light" data-light-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>huddlecast</title>
+<link rel="stylesheet" href="/static/primer.css">
+<link rel="stylesheet" href="/static/app.css?v={{.V}}">
+<script src="/static/app.js?v={{.V}}"></script>
+</head>
+<body class="color-bg-default color-fg-default">
+{{if .User.ID}}
+<div class="app">
+  <aside class="app-sidebar color-bg-subtle border-right p-3">
+    <a href="/" class="d-flex flex-items-center text-bold no-underline color-fg-default mb-3">
+      <span>huddlecast</span>
+    </a>
+    <nav class="SideNav border-0 mb-2" aria-label="Main">
+      <a class="SideNav-item" href="/" {{if eq .Page "dashboard"}}aria-current="page"{{end}}>Sessions</a>
+      <a class="SideNav-item" href="/sessions/new" {{if eq .Page "new"}}aria-current="page"{{end}}>New session</a>
+      <a class="SideNav-item" href="/recordings" {{if eq .Page "recordings"}}aria-current="page"{{end}}>Recordings</a>
+      {{if .User.Admin}}<a class="SideNav-item" href="/admin" {{if eq .Page "admin"}}aria-current="page"{{end}}>Admin</a>{{end}}
+    </nav>
+    <div class="app-user d-flex flex-items-center pt-3 border-top">
+      <span class="Avatar circle mr-2 d-flex flex-items-center flex-justify-center color-bg-accent-emphasis color-fg-on-emphasis text-bold" style="width:28px;height:28px">{{if .User.Name}}{{slice .User.Name 0 1}}{{else}}?{{end}}</span>
+      <span class="flex-1 text-bold Truncate"><span class="Truncate-text">{{.User.Name}}</span></span>
+      <a href="/logout" class="color-fg-muted no-underline" title="Sign out">Sign out</a>
+    </div>
+  </aside>
+  <main class="app-main p-4">
+    {{if .Error}}<div class="flash flash-error mb-3">{{.Error}}</div>{{end}}
+    {{template "content" .}}
+  </main>
+</div>
+{{else}}
+<main class="app-centered">
+  {{if .Error}}<div class="flash flash-error mb-3">{{.Error}}</div>{{end}}
+  {{template "content" .}}
+</main>
+{{end}}
+</body>
+</html>
+
+{{define "qualityfields"}}
+<div class="mb-2">
+  <label class="d-block">Preset <select class="form-select" data-preset style="max-width:220px"><option value="">Custom…</option></select></label>
+</div>
+<div class="d-flex flex-wrap flex-items-end" style="gap:12px">
+  <label class="d-block">Audio profile
+    <select class="form-select d-block" name="q_profile">
+      <option value="music-stereo" {{if eq .Audio.Profile "music-stereo"}}selected{{end}}>music (stereo)</option>
+      <option value="music-mono" {{if eq .Audio.Profile "music-mono"}}selected{{end}}>music (mono)</option>
+      <option value="speech" {{if eq .Audio.Profile "speech"}}selected{{end}}>speech</option>
+    </select>
+  </label>
+  <label class="d-block">Audio kbps<input class="form-control d-block" type="number" name="q_audio_kbps" value="{{.Audio.MaxBitrateKbps}}" style="width:100px"></label>
+  <label class="d-block">Video max kbps<input class="form-control d-block" type="number" name="q_video_kbps" value="{{.Video.MaxBitrateKbps}}" style="width:110px"></label>
+  <label class="d-block">FPS<input class="form-control d-block" type="number" name="q_fps" value="{{.Video.FPS}}" style="width:80px"></label>
+  <label class="d-block">Width<input class="form-control d-block" type="number" name="q_width" value="{{.Video.Width}}" style="width:90px"></label>
+  <label class="d-block">Height<input class="form-control d-block" type="number" name="q_height" value="{{.Video.Height}}" style="width:90px"></label>
+</div>
+{{end}}

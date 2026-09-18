@@ -1,0 +1,71 @@
+{{define "content"}}
+<h1 class="h2 mb-3">New session</h1>
+<form method="post" action="/sessions" style="max-width:640px">
+  <div class="Box mb-3">
+    <div class="Box-header"><span class="text-bold f6">Source</span></div>
+    <div class="Box-body">
+      <div class="form-checkbox mt-0">
+        <label><input type="radio" name="source_type" value="push" checked onchange="hcSource()"> OBS push (WHIP / RTMP)</label>
+      </div>
+      <div id="src-push" class="ml-4">
+        <div class="form-group mt-1">
+          <div class="form-group-header"><label>Stream key</label></div>
+          <div class="form-group-body">
+            <select class="form-select" name="stream_key">{{range .Keys}}<option value="{{.Key}}">{{.Key}} {{.Label}}</option>{{end}}</select>
+          </div>
+        </div>
+        {{if not .Keys}}<p class="color-fg-muted f6">You have no stream key yet — create one on the <a href="/">dashboard</a>.</p>{{end}}
+      </div>
+      <div class="form-checkbox">
+        <label><input type="radio" name="source_type" value="mirror" onchange="hcSource()"> Mirror a live huddle</label>
+      </div>
+      <div id="src-mirror" class="ml-4 hidden">
+        <div class="form-group mt-1">
+          <div class="form-group-header"><label>Source channel</label></div>
+          <div class="form-group-body"><input class="form-control input-block" name="mirror_channel" list="channels" placeholder="#channel"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="Box mb-3">
+    <div class="Box-header"><span class="text-bold f6">Targets</span></div>
+    <div class="Box-body">
+      {{if .Channels}}
+      <div class="chips mb-2">
+        {{range .Channels}}<label class="pill"><input type="checkbox" name="targets" value="{{.ID}}" class="mr-1"> #{{.Name}}</label>{{end}}
+      </div>
+      {{end}}
+      <div class="form-group">
+        <div class="form-group-header"><label>Channels{{if not .Channels}} — paste channel IDs{{end}}</label></div>
+        <div class="form-group-body"><input class="form-control input-block" name="extra" placeholder="C0C2RBUP9TK C0C2QQ62RAN"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="Box mb-3">
+    <div class="Box-header"><span class="text-bold f6">Presentation</span></div>
+    <div class="Box-body">
+      <div class="form-checkbox mt-0"><label><input type="radio" name="presentation" value="screen" checked> Screen share (big tile)</label></div>
+      <div class="form-checkbox"><label><input type="radio" name="presentation" value="camera"> Camera tile</label></div>
+      <div class="form-checkbox"><label><input type="radio" name="presentation" value="both"> Both</label></div>
+    </div>
+  </div>
+
+  <div class="Box mb-3">
+    <div class="Box-body">
+      <div class="form-checkbox mt-0"><label><input type="checkbox" name="record" checked> Record this session</label></div>
+    </div>
+  </div>
+
+  <details class="Box mb-3">
+    <summary class="Box-header text-bold f6" style="cursor:pointer">Advanced quality</summary>
+    <div class="Box-body">
+      {{template "qualityfields" .Quality}}
+    </div>
+  </details>
+
+  <button class="btn btn-primary" type="submit">Start streaming</button>
+</form>
+<datalist id="channels">{{range .Channels}}<option value="#{{.Name}}">{{end}}</datalist>
+{{end}}
